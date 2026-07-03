@@ -29,6 +29,8 @@ Write **prose over tokens**, and **specific references over adjectives**: "1970s
 2. Add **one line** to the generated `AGENTS.md`/`CLAUDE.md`: *"UI work: read `DESIGN.md` and conform to it — it is the source of truth for color, type, spacing, radius, and components. Reuse its tokens; don't invent new values."* That pointer is what makes the artifact load-bearing; a `DESIGN.md` no instruction file references gets ignored.
 3. Keep it to **one** canonical `DESIGN.md`. Don't over-tokenize — not every CSS value needs a token; capture intent and the handful of decisions that must stay consistent.
 
+`create-harness.mjs --design` does steps 1-2 mechanically: it scaffolds `DESIGN.md` from the template, adds the Design pointer section to the instruction file, and leaves a commented `design.md lint` hook in `init.sh` to enable once the placeholders are filled.
+
 ## Generating the design with Google Stitch (optional)
 
 A `DESIGN.md` *documents* a design; it doesn't *create* one. When a UI project is greenfield or getting a redesign, recommend **[Google Stitch](https://stitch.withgoogle.com)** — the Google-native UI generator that speaks this exact format (the `design.md` spec originates from Stitch's docs). It ships a **first-party MCP server** and an **official skill suite**, so an agent can drive the whole loop.

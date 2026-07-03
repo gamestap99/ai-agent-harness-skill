@@ -30,7 +30,7 @@ If baseline verification is failing, repair that first before adding new scope.
 - `progress.md` — Session continuity log
 - `init.sh` — Standard startup and verification path
 - `session-handoff.md` — Optional, for larger sessions
-
+{{DESIGN_SECTION}}
 ## Definition of Done
 
 A feature is done only when ALL of the following are true:

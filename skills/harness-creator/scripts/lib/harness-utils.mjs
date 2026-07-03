@@ -185,15 +185,21 @@ export function verificationCommands(project, explicitPackageManager) {
   return [install, ...dedupe(candidates)];
 }
 
-export function initScriptFromCommands(commands) {
+export function initScriptFromCommands(commands, { designLint = false } = {}) {
   const body = commands.map((command) => `echo "=== ${escapeForEcho(command)} ==="\n${command}`).join('\n\n');
+  const designBlock = designLint
+    ? `
+# Design system check — uncomment once DESIGN.md placeholders are filled in:
+# npx @google/design.md lint DESIGN.md
+`
+    : '';
   return `#!/bin/bash
 set -e
 
 echo "=== Harness Initialization ==="
 
 ${body}
-
+${designBlock}
 echo "=== Verification Complete ==="
 echo ""
 echo "Next steps:"

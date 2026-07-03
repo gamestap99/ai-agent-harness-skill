@@ -15,7 +15,7 @@ import {
 const args = parseArgs(process.argv.slice(2));
 
 if (args.help) {
-  console.log(`Usage: node scripts/create-harness.mjs [--target DIR] [--agent-file AGENTS.md|CLAUDE.md] [--package-manager npm|pnpm|yarn|bun] [--force]
+  console.log(`Usage: node scripts/create-harness.mjs [--target DIR] [--agent-file AGENTS.md|CLAUDE.md] [--package-manager npm|pnpm|yarn|bun] [--design] [--force]
 
 Creates a minimal production harness:
   AGENTS.md or CLAUDE.md
@@ -23,6 +23,7 @@ Creates a minimal production harness:
   progress.md
   session-handoff.md
   init.sh
+  DESIGN.md (only with --design, for UI projects)
 
 Existing files are skipped unless --force is set.`);
   process.exit(0);
@@ -31,6 +32,7 @@ Existing files are skipped unless --force is set.`);
 const target = path.resolve(args.target || args._[0] || process.cwd());
 const agentFile = args.agentFile || 'AGENTS.md';
 const force = Boolean(args.force);
+const design = Boolean(args.design);
 const project = await detectProject(target);
 project.packageManager = detectPackageManager(target, args.packageManager);
 const commands = args.commands
@@ -45,7 +47,14 @@ const replacements = {
     ? 'Project harness for reliable agent-assisted development.'
     : `Project harness for reliable agent-assisted development in a ${project.stack} codebase.`,
   VERIFICATION_COMMANDS: commands.map((command) => `- \`${command}\``).join('\n'),
-  PRIMARY_VERIFICATION_COMMAND: './init.sh'
+  PRIMARY_VERIFICATION_COMMAND: './init.sh',
+  DESIGN_SECTION: design
+    ? `
+## Design
+
+UI work: read \`DESIGN.md\` and conform to it — it is the source of truth for color, type, spacing, radius, and components. Reuse its tokens; don't invent new values. Once its placeholders are filled, validate with \`npx @google/design.md lint DESIGN.md\`.
+`
+    : ''
 };
 
 const results = [];
@@ -53,10 +62,13 @@ results.push(await copyTemplate('agents.md', path.join(target, agentFile), repla
 results.push(await copyTemplate('feature-list.json', path.join(target, 'feature_list.json'), {}, { force }));
 results.push(await copyTemplate('progress.md', path.join(target, 'progress.md'), {}, { force }));
 results.push(await copyTemplate('session-handoff.md', path.join(target, 'session-handoff.md'), {}, { force }));
+if (design) {
+  results.push(await copyTemplate('design.md', path.join(target, 'DESIGN.md'), {}, { force }));
+}
 
 const initPath = path.join(target, 'init.sh');
 if (force || !await exists(initPath)) {
-  await writeText(initPath, initScriptFromCommands(commands));
+  await writeText(initPath, initScriptFromCommands(commands, { designLint: design }));
   await chmod(initPath, 0o755);
   results.push({ path: initPath, status: 'written' });
 } else {
@@ -72,4 +84,10 @@ for (const command of commands) {
 console.log('');
 for (const result of results) {
   console.log(`${result.status.toUpperCase()} ${path.relative(target, result.path)}${result.reason ? ` (${result.reason})` : ''}`);
+}
+
+if (!design && project.stack === 'typescript-react' && !await exists(path.join(target, 'DESIGN.md'))) {
+  console.log('');
+  console.log('UI stack detected but no DESIGN.md. For a persistent design source of truth,');
+  console.log('re-run with --design, or see references/design-system-pattern.md (Google Stitch can generate one).');
 }

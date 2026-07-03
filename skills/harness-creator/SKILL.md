@@ -46,6 +46,7 @@ Options:
 - `--agent-file CLAUDE.md` for Claude-oriented projects.
 - `--package-manager npm|pnpm|yarn|bun` when detection is wrong.
 - `--commands "cmd one,cmd two"` for custom verification.
+- `--design` for UI projects: also scaffolds `DESIGN.md` (google-labs-code/design.md format), a Design section in the instruction file, and a commented lint hook in `init.sh`. See [Design System](references/design-system-pattern.md).
 - `--force` only after confirming overwrites are acceptable.
 
 Then explain what was created and how the user should replace placeholder feature entries.
@@ -59,6 +60,8 @@ node skills/harness-creator/scripts/validate-harness.mjs --target /path/to/proje
 ```
 
 Report the five subsystem scores, the lowest-scoring area, and the first 2-3 changes that would improve reliability. Treat the lowest score as a candidate bottleneck; confirm with failures, logs, or task outcomes before claiming causality.
+
+The rubric assumes a feature-development repo. When the target has no project manifest and no feature tracker (a workspace, docs, or meta-repo), the script prints a caveat — read low state/lifecycle scores there as "not applicable", not as defects, and do not scaffold files the repo doesn't need to chase the number.
 
 ### Produce a report
 
