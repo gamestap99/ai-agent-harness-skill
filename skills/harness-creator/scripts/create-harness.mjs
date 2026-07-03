@@ -7,6 +7,7 @@ import {
   detectProject,
   exists,
   initScriptFromCommands,
+  isFrontendProject,
   parseArgs,
   verificationCommands,
   writeText
@@ -86,8 +87,8 @@ for (const result of results) {
   console.log(`${result.status.toUpperCase()} ${path.relative(target, result.path)}${result.reason ? ` (${result.reason})` : ''}`);
 }
 
-if (!design && project.stack === 'typescript-react' && !await exists(path.join(target, 'DESIGN.md'))) {
+if (!design && isFrontendProject(project) && !await exists(path.join(target, 'DESIGN.md'))) {
   console.log('');
-  console.log('UI stack detected but no DESIGN.md. For a persistent design source of truth,');
+  console.log('Frontend project detected but no DESIGN.md. For a persistent design source of truth,');
   console.log('re-run with --design, or see references/design-system-pattern.md (Google Stitch can generate one).');
 }

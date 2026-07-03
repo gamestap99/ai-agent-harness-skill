@@ -140,6 +140,27 @@ export async function listFiles(root, { maxFiles = 1000 } = {}) {
   return results.sort();
 }
 
+const FRONTEND_DEPS = [
+  'react', 'react-dom', 'react-native', 'expo', 'next', 'gatsby',
+  'vue', 'nuxt', 'svelte', '@sveltejs/kit', '@angular/core', 'astro',
+  'solid-js', 'preact', 'lit', '@remix-run/react', '@ionic/core',
+  'alpinejs', 'htmx.org', 'tailwindcss'
+];
+
+export function isFrontendProject(project) {
+  const deps = { ...(project.packageJson?.dependencies || {}), ...(project.packageJson?.devDependencies || {}) };
+  if (FRONTEND_DEPS.some((dep) => deps[dep])) return true;
+
+  const files = project.files || [];
+  const has = (name) => files.some((file) => file === name || file.endsWith(`/${name}`));
+  const hasExt = (ext) => files.some((file) => file.endsWith(ext));
+  if (has('angular.json') || hasExt('.vue') || hasExt('.svelte') || hasExt('.jsx') || hasExt('.tsx')) return true;
+  if (files.some((file) => /(^|\/)tailwind\.config\.(js|cjs|mjs|ts)$/.test(file))) return true;
+  if (has('index.html') || (hasExt('.html') && hasExt('.css'))) return true;
+  if (has('pubspec.yaml')) return true;
+  return false;
+}
+
 export function verificationCommands(project, explicitPackageManager) {
   const pm = explicitPackageManager || project.packageManager || 'npm';
   const scripts = project.packageJson?.scripts ?? {};

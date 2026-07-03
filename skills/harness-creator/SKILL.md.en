@@ -46,7 +46,7 @@ Options:
 - `--agent-file CLAUDE.md` for Claude-oriented projects.
 - `--package-manager npm|pnpm|yarn|bun` when detection is wrong.
 - `--commands "cmd one,cmd two"` for custom verification.
-- `--design` for UI projects: also scaffolds `DESIGN.md` (google-labs-code/design.md format), a Design section in the instruction file, and a commented lint hook in `init.sh`. See [Design System](references/design-system-pattern.md).
+- `--design` for UI projects: also scaffolds `DESIGN.md` (google-labs-code/design.md format), a Design section in the instruction file, and a commented lint hook in `init.sh`. When any frontend project is detected (React/Vue/Svelte/Angular/Astro, Tailwind, static HTML+CSS, React Native/Flutter, …) without `--design`, the script suggests it — and Google Stitch as the generator — instead of scaffolding uninvited. See [Design System](references/design-system-pattern.md).
 - `--force` only after confirming overwrites are acceptable.
 
 Then explain what was created and how the user should replace placeholder feature entries.
