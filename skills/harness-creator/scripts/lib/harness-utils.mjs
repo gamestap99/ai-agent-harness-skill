@@ -161,6 +161,29 @@ export function isFrontendProject(project) {
   return false;
 }
 
+export async function isStitchMcpConfigured(target) {
+  const home = process.env.HOME || process.env.USERPROFILE || '';
+  const candidates = [
+    path.join(target, '.mcp.json'),          // claude mcp add ... -s project
+    home ? path.join(home, '.claude.json') : null // claude mcp add ... -s user
+  ].filter(Boolean);
+
+  for (const file of candidates) {
+    try {
+      const data = JSON.parse(await readText(file));
+      if (data?.mcpServers?.stitch) return true;
+      if (data?.projects && typeof data.projects === 'object') {
+        for (const proj of Object.values(data.projects)) {
+          if (proj?.mcpServers?.stitch) return true;
+        }
+      }
+    } catch {
+      // missing or unparseable config — treat as not configured
+    }
+  }
+  return false;
+}
+
 export function verificationCommands(project, explicitPackageManager) {
   const pm = explicitPackageManager || project.packageManager || 'npm';
   const scripts = project.packageJson?.scripts ?? {};

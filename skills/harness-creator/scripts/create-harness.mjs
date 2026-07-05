@@ -8,6 +8,7 @@ import {
   exists,
   initScriptFromCommands,
   isFrontendProject,
+  isStitchMcpConfigured,
   parseArgs,
   verificationCommands,
   writeText
@@ -90,5 +91,12 @@ for (const result of results) {
 if (!design && isFrontendProject(project) && !await exists(path.join(target, 'DESIGN.md'))) {
   console.log('');
   console.log('Frontend project detected but no DESIGN.md. For a persistent design source of truth,');
-  console.log('re-run with --design, or see references/design-system-pattern.md (Google Stitch can generate one).');
+  console.log('re-run with --design, or see references/design-system-pattern.md.');
+  if (await isStitchMcpConfigured(target)) {
+    console.log('Google Stitch MCP is configured — ask the agent to generate or extract a DESIGN.md.');
+  } else {
+    console.log('To generate one with Google Stitch (MCP not configured yet), add the server:');
+    console.log('  claude mcp add stitch --transport http https://stitch.googleapis.com/mcp --header "X-Goog-Api-Key: <KEY>" -s user');
+    console.log('  (API key: Stitch Settings > API Keys)');
+  }
 }
