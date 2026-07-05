@@ -42,7 +42,7 @@ Two entry points, both from `google-labs-code`:
   claude mcp add stitch --transport http https://stitch.googleapis.com/mcp --header "X-Goog-Api-Key: <KEY>" -s user
   ```
   (OAuth is the alternative for zero-trust/ephemeral setups: `gcloud auth application-default login`, then a `Authorization: Bearer <token>` + `X-Goog-User-Project: <project>` header — but the token expires hourly, so the API key is simpler on a persistent machine.) It exposes `create_project`, `generate_screen_from_text` (model `GEMINI_3_FLASH` or `GEMINI_3_1_PRO`), `generate_variants`, and `edit_screens` for generation, plus `create_design_system` / `apply_design_system` / `list_design_systems` (the stitch-skills layer adds `upload_design_md` + `create_design_system_from_design_md` to push a `DESIGN.md` in). Scope it like any MCP — see [Tool Registry & Safety](tool-registry-pattern.md).
-- **Stitch skills** ([`google-labs-code/stitch-skills`](https://github.com/google-labs-code/stitch-skills)) — install into Claude Code with `npx plugins add google-labs-code/stitch-skills --scope project --target claude-code`. Three plugins: `stitch-design` (generate/edit screens, `code-to-design`, `extract-design-md`), `stitch-utilities` (`design-md` and `taste-design` **emit a DESIGN.md**; `enhance-prompt`), and `stitch-build` (`react-components`, `react-native`, `shadcn-ui` — codegen from the design).
+- **Stitch skills** ([`google-labs-code/stitch-skills`](https://github.com/google-labs-code/stitch-skills)) — install the whole suite with `npx plugins add google-labs-code/stitch-skills --scope project --target claude-code`, or one skill at a time with `npx add-skill google-labs-code/stitch-skills --skill <name> --global` (e.g. `--skill react:components`). Three plugins: `stitch-design` (generate/edit screens, `code-to-design`, `extract-design-md`), `stitch-utilities` (`design-md` and `taste-design` **emit a DESIGN.md**; `enhance-prompt`), and `stitch-build` (`react-components`, `react-native`, `shadcn-ui` — codegen from the design).
 
 The round-trip is what makes it a harness fit:
 
@@ -51,6 +51,8 @@ The round-trip is what makes it a harness fit:
 3. Agents **conform** to it for hand-written UI, or **codegen** with `stitch-build` and keep code in sync via `manage-design-system`.
 
 Recommend, don't require. Stitch is the richest path when the user wants generation *and* a canonical `DESIGN.md` in one loop; a hand-written `DESIGN.md` + the `design.md` CLI is the zero-dependency path. Both converge on the same artifact.
+
+For the concrete driving prompts — "show my Stitch projects", pull a screen's HTML (a complete Tailwind document) or image, then convert to your framework — follow Stitch's own *Getting Started* and *Build in a Loop* docs rather than duplicating them here.
 
 ## Verification (this is the design subsystem's "tests")
 
