@@ -96,6 +96,8 @@ Load only the reference needed for the user's problem:
 - Require evidence before marking a feature done.
 - Use one active feature unless the harness has explicit multi-agent ownership boundaries.
 - Prefer append/update state files over relying on chat history.
+- Separate rules from state by *lifetime*: durable conventions (external-tool usage, delegation/review policy) belong in the instruction file; ephemeral state (current feature, progress) in state files. When a feature closes, promote the long-lived rules it produced out of the feature notes. See [Gotchas](references/gotchas.md) #18.
+- For external async operations (generation, remote builds, cloud jobs), bake in: record fire timestamps, poll patiently, treat client timeout as "still running" not "failed", and never re-fire before the service's known latency elapses. See [Gotchas](references/gotchas.md) #16.
 - Govern restraint, not just scope: bake a short minimalism clause (YAGNI → reuse → stdlib → native → one line) into the instruction file so agents don't over-build *inside* an in-scope feature. See [Minimalism & Restraint](references/minimalism-restraint-pattern.md); for always-on enforcement, point the user at the `ponytail-resolve` skill.
 - For UI/frontend projects, give agents a persistent design source of truth: add a `DESIGN.md` (google-labs-code/design.md format) at the repo root and point the instruction file at it. Skip it for backend/CLI/library work. When the design must be *generated* (greenfield/redesign), recommend Google Stitch and its first-party MCP + `stitch-skills` suite, which emit that same `DESIGN.md`. See [Design System](references/design-system-pattern.md).
 - Never hide destructive behavior in scripts; overwrites require explicit user approval.

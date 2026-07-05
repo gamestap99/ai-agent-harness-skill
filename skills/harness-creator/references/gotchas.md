@@ -200,10 +200,40 @@ registry.register('shell', {
 
 ---
 
+## 16. External Async Ops: Timeout ≠ Failure
+
+**Symptom**: A slow external op (design generation, remote build, cloud job) times out client-side; the result lands 5–10 min later. You re-fired "because it failed" and now have duplicate side-effects (two persisted results).
+
+**Cause**: A client timeout is not op failure — the work is still running server-side. When an op is unobservable, it's tempting to blame *behavior* ("the input was bad, it silently failed") when the real cause is *timing* (it's just slow).
+
+**Fix**: Record the fire timestamp in `progress.md`; poll patiently (≥ the service's known latency) before concluding; never re-fire before that window elapses. Test the timing hypothesis before the behavior one. Write the service's known latency into the harness docs so the next session doesn't rediscover it — and for repeated polling, prefer a background poll script over manual sleep+poll. A wrong conclusion left in docs is worse than none: when a later observation contradicts it, go back and fix the doc.
+
+---
+
+## 17. validate-harness Matches English Anchors Literally
+
+**Symptom**: A genuinely good harness written in another language scores low (e.g., 68/100) even though every subsystem is present.
+
+**Cause**: `validate-harness.mjs` scores by substring-matching English anchor phrases ("Startup Workflow", "Definition of Done", "One feature at a time", "End of Session"). Non-English headings miss the match even when the content underneath is correct.
+
+**Fix**: Keep the standard English anchor headings; write the native-language prose under them (a bilingual harness). The score measures anchor *presence*, not language quality — don't translate the anchors themselves.
+
+---
+
+## 18. Rules Outlive the Feature That Birthed Them
+
+**Symptom**: A convention (how to drive an external tool, a delegation/review policy) vanishes after its feature closes; the next session re-derives or violates it.
+
+**Cause**: The rule was written into feature-scoped state (`plan.md` / `progress.md` / feature notes), which gets pruned when the feature completes. Durable conventions and ephemeral state have different lifetimes but were stored together.
+
+**Fix**: Separate by lifetime. Ephemeral (current feature, progress, next step) → `progress.md` / `feature_list.json`. Durable (conventions, tool usage, policies) → the instruction file (`AGENTS.md` / `CLAUDE.md`). When a feature closes, promote any long-lived rule it produced out of the feature file into the instruction file.
+
+---
+
 ## Related Reading
 
 - [Memory Persistence Pattern](memory-persistence-pattern.md) — Gotchas #1, #3, #4, #15
 - [Tool Registry Pattern](tool-registry-pattern.md) — Gotchas #5, #6, #13
 - [Multi-agent Pattern](multi-agent-pattern.md) — Gotchas #8, #11
-- [Context Engineering Pattern](context-engineering-pattern.md) — Gotchas #9
-- [Lifecycle Pattern](lifecycle-bootstrap-pattern.md) — Gotchas #10, #14
+- [Context Engineering Pattern](context-engineering-pattern.md) — Gotchas #9, #18
+- [Lifecycle Pattern](lifecycle-bootstrap-pattern.md) — Gotchas #10, #14, #16

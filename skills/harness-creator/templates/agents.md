@@ -18,6 +18,7 @@ If baseline verification is failing, repair that first before adding new scope.
 ## Working Rules
 
 - **One feature at a time**: Pick exactly one unfinished feature from `feature_list.json`
+- **Spikes are the exception**: a timeboxed investigation (feasibility, setup, or a POC in another area) may happen without flipping the active feature — but keep it timeboxed and record findings in `progress.md` before the session ends. A spike that quietly becomes feature work is scope creep.
 - **Verification required**: Don't claim done without running verification commands
 - **Update artifacts**: Before ending session, update `progress.md` and `feature_list.json`
 - **Stay in scope**: Don't modify files unrelated to the current feature
