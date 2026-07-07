@@ -1,5 +1,7 @@
 # Multi-Agent Coordination Pattern
 
+> **Audience: both.** If you *orchestrate* agents over a repo task, the coordinator-synthesizes-not-delegates rule and the self-contained-worker-prompt structure are directly usable. The fork/swarm context-inheritance mechanics and the single-level fork guard are agent-runtime concerns — take them as principle unless you're implementing delegation in the runtime.
+
 ## Problem
 
 Single agents hit limits:

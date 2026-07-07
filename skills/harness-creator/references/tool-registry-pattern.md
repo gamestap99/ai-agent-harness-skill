@@ -1,5 +1,7 @@
 # Tool Registry and Safety Pattern
 
+> **Audience: agent-runtime builders.** This describes how a runtime registers and gates tools. If you're only harnessing a repo (`AGENTS.md` + state files), you don't implement any of this — carry the *principles* into the instruction file and permission config: fail-closed defaults, per-call (not per-tool) classification, and never auto-approve destructive commands. Skip the TypeScript internals.
+
 ## Problem
 
 Agents need tools (shell, file edit, search, etc.) to be productive. But unbounded tool access creates risks:

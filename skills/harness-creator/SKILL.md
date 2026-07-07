@@ -63,6 +63,16 @@ Report the five subsystem scores, the lowest-scoring area, and the first 2-3 cha
 
 The rubric assumes a feature-development repo. When the target has no project manifest and no feature tracker (a workspace, docs, or meta-repo), the script prints a caveat — read low state/lifecycle scores there as "not applicable", not as defects, and do not scaffold files the repo doesn't need to chase the number.
 
+### Improve an existing harness
+
+When a harness exists but scores below target, run:
+
+```bash
+node skills/harness-creator/scripts/improve-harness.mjs --target /path/to/project
+```
+
+It prints a concrete remediation for every failed check, lowest subsystem first. Text-level gaps (missing sections, rules) are hand edits you make from those remediations. To fill *structural* gaps mechanically, add `--apply`: it scaffolds only the standard files that are missing and never overwrites an existing one (existing files are reported "skipped"). Re-score with `validate-harness.mjs` afterward, and remember a structural fix is not a behavioral guarantee — confirm with a real agent session.
+
 ### Produce a report
 
 Use when the user wants a shareable assessment:
@@ -76,17 +86,22 @@ Be clear that this is a structural benchmark. Real effectiveness still needs bef
 
 ## When to Read References
 
-Load only the reference needed for the user's problem:
+Load only the reference needed for the user's problem. The references serve two audiences — know which one you're in:
+
+**Harnessing a repo** — the default. Artifacts an agent reads and writes in a project (`AGENTS.md`, state files, design, restraint):
+
+- Design source of truth for UI/frontend work: [Design System](references/design-system-pattern.md)
+- Restraint / anti-over-engineering: [Minimalism & Restraint](references/minimalism-restraint-pattern.md)
+- Reusable workflows packaged as skills: [Skill Runtime](references/skill-runtime-pattern.md)
+- Non-obvious failure modes: [Gotchas](references/gotchas.md)
+
+**Building an agent runtime** — advanced. Mechanisms *inside* the agent (memory stores, tool gating, context budget, orchestration). Read these for the design principle; skip the runtime-implementation detail if you only need a repo harness:
 
 - Memory across sessions: [Memory Persistence](references/memory-persistence-pattern.md)
-- Reusable workflows as skills: [Skill Runtime](references/skill-runtime-pattern.md)
-- Permissions, tools, concurrency: [Tool Registry & Safety](references/tool-registry-pattern.md)
 - Context budget and progressive disclosure: [Context Engineering](references/context-engineering-pattern.md)
+- Permissions, tools, concurrency: [Tool Registry & Safety](references/tool-registry-pattern.md)
 - Delegation and parallel agents: [Multi-Agent Coordination](references/multi-agent-pattern.md)
-- Design source of truth for UI/frontend work: [Design System](references/design-system-pattern.md)
 - Hooks, startup, long-running work: [Lifecycle & Bootstrap](references/lifecycle-bootstrap-pattern.md)
-- Restraint / anti-over-engineering: [Minimalism & Restraint](references/minimalism-restraint-pattern.md)
-- Non-obvious failure modes: [Gotchas](references/gotchas.md)
 
 ## Design Rules
 

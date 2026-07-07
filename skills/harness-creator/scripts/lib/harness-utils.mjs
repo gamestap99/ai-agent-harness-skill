@@ -281,14 +281,14 @@ export function scoreHarness(files) {
     ],
     state: [
       hasFile(byPath, ['feature_list.json', 'feature-list.json'], 'Feature tracker exists'),
-      jsonFeatureList(featureList, 'Feature tracker is valid and has feature fields'),
+      jsonFeatureList(featureList, 'Feature tracker is valid (schema, one active feature, evidence on done)'),
       hasFile(byPath, ['progress.md'], 'Progress log exists'),
       textHas(progress, ['Current State', 'What', 'Next'], 'Progress log supports restart'),
       textHas(handoff || progress, ['Blockers', 'Files', 'Next Session'], 'Handoff captures blockers/files/next step')
     ],
     verification: [
       hasFile(byPath, ['init.sh'], 'Verification entrypoint exists'),
-      textHas(init, ['set -e'], 'Verification fails fast'),
+      initRunsRealCommand(init, 'Verification runs a real command and fails fast (set -e)'),
       textHas(init + agents, ['test', 'pytest', 'vitest', 'cargo test', 'go test', 'dotnet test'], 'Test command documented'),
       textHas(init + agents, ['build', 'type', 'lint', 'compile'], 'Static/build check documented'),
       textHas(allText, ['Evidence', 'Verification Evidence', 'command and output'], 'Verification evidence is recorded')
@@ -338,16 +338,44 @@ function textHas(text, needles, message) {
 function jsonFeatureList(text, message) {
   try {
     const parsed = JSON.parse(text);
-    const valid = Array.isArray(parsed.features) && parsed.features.every((feature) =>
+    if (!Array.isArray(parsed.features)) return { pass: false, message };
+
+    // Schema: every feature carries the required fields.
+    const schemaOk = parsed.features.every((feature) =>
       typeof feature.id === 'string'
       && typeof feature.name === 'string'
       && typeof feature.description === 'string'
       && typeof feature.status === 'string'
     );
-    return { pass: valid, message };
+
+    // Substance (language-independent, can't be faked by copying headings):
+    // at most one active feature, and every done feature records evidence.
+    const activeCount = parsed.features.filter((feature) => feature.status === 'in-progress').length;
+    const doneHaveEvidence = parsed.features
+      .filter((feature) => feature.status === 'done')
+      .every((feature) => typeof feature.evidence === 'string' && feature.evidence.trim().length > 0);
+
+    return { pass: schemaOk && activeCount <= 1 && doneHaveEvidence, message };
   } catch {
     return { pass: false, message };
   }
+}
+
+// A real command is any executable line that isn't a shebang, a `set` directive,
+// a comment, an `echo`, or a lone shell keyword. Substance over anchor text.
+function initRunsRealCommand(init, message) {
+  const failsFast = /^\s*set\s+-[a-z]*e/m.test(init);
+  const keywords = new Set(['fi', 'else', 'then', 'do', 'done', 'elif', 'esac', '{', '}']);
+  const hasCommand = init.split('\n').some((raw) => {
+    const line = raw.trim();
+    if (!line) return false;
+    if (line.startsWith('#')) return false;
+    if (line.startsWith('set ')) return false;
+    if (line.startsWith('echo')) return false;
+    if (keywords.has(line)) return false;
+    return true;
+  });
+  return { pass: failsFast && hasCommand, message };
 }
 
 export async function loadHarnessFiles(root) {

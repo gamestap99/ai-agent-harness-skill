@@ -210,13 +210,13 @@ registry.register('shell', {
 
 ---
 
-## 17. validate-harness Matches English Anchors Literally
+## 17. validate-harness Mixes English Anchors with Structural Checks
 
-**Symptom**: A genuinely good harness written in another language scores low (e.g., 68/100) even though every subsystem is present.
+**Symptom**: A genuinely good harness written in another language scores lower than an English one even though every subsystem is present — but a harness that only *copies the English headings* (empty `init.sh`, three "active" features, `done` with no evidence) no longer scores a perfect 100.
 
-**Cause**: `validate-harness.mjs` scores by substring-matching English anchor phrases ("Startup Workflow", "Definition of Done", "One feature at a time", "End of Session"). Non-English headings miss the match even when the content underneath is correct.
+**Cause**: Most `validate-harness.mjs` checks still substring-match English anchor phrases ("Startup Workflow", "Definition of Done", "One feature at a time", "End of Session"), so non-English headings miss those. Two checks are now *structural and language-independent*: the state check parses `feature_list.json` (valid schema **and** at most one `in-progress` feature **and** every `done` feature carries evidence), and the verification check parses `init.sh` for a real runnable command (not just `set -e` + `echo`). Those two reward substance and cannot be faked by copying headings.
 
-**Fix**: Keep the standard English anchor headings; write the native-language prose under them (a bilingual harness). The score measures anchor *presence*, not language quality — don't translate the anchors themselves.
+**Fix**: Keep the standard English anchor headings for the text-based checks; write the native-language prose under them (a bilingual harness). For the two structural checks, the *data* has to be real — one active feature, evidence recorded on done, and an `init.sh` that actually runs something. The score measures anchor *presence* plus a floor of real substance; don't translate the anchors themselves, and don't ship a hollow harness that only looks right.
 
 ---
 

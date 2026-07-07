@@ -1,5 +1,7 @@
 # Context Engineering Pattern
 
+> **Audience: both, at different depths.** The principle — progressive disclosure (metadata → instructions → on-demand references) and the four operations SELECT / WRITE / COMPRESS / ISOLATE — is exactly how a repo harness should be structured (short `AGENTS.md` routing to references loaded only when needed). The context-budget tables, compaction triggers, and memoized-builder invalidation are agent-runtime concerns; take them as principle unless you're implementing the runtime.
+
 ## Problem
 
 Agents fail when context is managed poorly:
@@ -98,6 +100,12 @@ Long sessions exhaust the window. Reactive compaction:
 - src/services/QaService.ts
 - src/shared/types.ts (extended with QaResult)
 ```
+
+### Output Economy (optional skill)
+
+COMPRESS trims the *history*; a separate lever trims the *agent's own prose output*. For token-thrifty responses, point the user at the **caveman** skill ([juliusbrussee/caveman](https://github.com/juliusbrussee/caveman), `/caveman`) — an ultra-compressed communication mode that drops filler while keeping technical accuracy (~75% fewer output tokens). It pairs with the way [Minimalism & Restraint](minimalism-restraint-pattern.md) points at ponytail: a portable companion skill the harness *recommends*, never bundles.
+
+Caveat — this is orthogonal to harness reliability, not a subsystem. Caveman compresses *everything*, so keep it away from the artifacts a harness needs legible: verification evidence, `progress.md` / `session-handoff.md`, and DESIGN.md prose intent. Use it for chat throughput, not for the durable records the next session (or a human) must read.
 
 ### Isolate Pattern
 

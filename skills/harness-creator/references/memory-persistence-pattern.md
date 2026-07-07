@@ -1,5 +1,7 @@
 # Memory and Persistence Pattern
 
+> **Audience: both, at different depths.** The layering (instruction memory vs. agent-written auto-memory), the type taxonomy, and *what not to save* (derivable content) apply directly when you set up a repo's memory files. The two-step-save invariant, index byte-caps, background extraction, and mutual-exclusion timing are agent-runtime internals — read them as principle unless you're building the memory subsystem itself.
+
 ## Problem
 
 Without persistent memory, an agent loses all user preferences, project context, and behavioral feedback the moment a session ends. Users must repeat corrections every session ("use bun, not npm"), and the agent cannot accumulate the working knowledge that makes it genuinely useful over time.

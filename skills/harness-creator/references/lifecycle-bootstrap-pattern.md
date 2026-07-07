@@ -1,5 +1,7 @@
 # Lifecycle and Bootstrap Pattern
 
+> **Audience: mostly agent-runtime builders.** The hook-dispatch, bootstrap-staging, and two-phase-eviction internals are for people implementing the runtime. If you're harnessing a repo, the part that applies to you is small and concrete: `init.sh` as the single startup+verification entrypoint, an end-of-session routine, and a clean restartable state — that lives in the instruction file, not in code. Read the rest for principle only.
+
 ## Problem
 
 Agent runtimes need extensibility without compromising safety:

@@ -145,6 +145,20 @@
         "Recommends Google Stitch (first-party MCP + stitch-skills) when the design must be generated rather than documented",
         "Does not add design to the five scored subsystems and skips the pattern for non-UI repos"
       ]
+    },
+    {
+      "id": 12,
+      "name": "Improve an Incomplete Harness",
+      "prompt": "I already have an AGENTS.md and init.sh but no feature tracker or handoff, and my agent still drifts. Improve the existing harness without clobbering my custom files.",
+      "expected_output": "improve-harness.mjs audit with per-check remediations, then a non-destructive --apply gap-fill that scaffolds only the missing standard files",
+      "files": ["existing-AGENTS.md", "existing-init.sh"],
+      "expectations": [
+        "Uses improve-harness.mjs to audit and lists a concrete remediation per failed check",
+        "Distinguishes structural gaps (scaffoldable) from text-level fixes done by hand",
+        "--apply scaffolds only missing standard files and never overwrites existing ones",
+        "Re-scores with validate-harness.mjs after the gap-fill",
+        "States that a structural fix is not a behavioral guarantee — confirm with a real agent session"
+      ]
     }
   ]
 }
